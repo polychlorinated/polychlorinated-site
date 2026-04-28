@@ -1,4 +1,4 @@
-const WP_API_URL = import.meta.env.WP_API_URL ?? 'https://your-wordpress-site.com/wp-json/wp/v2';
+const WP_API_URL = import.meta.env.WP_API_URL ?? 'https://cms.polychlorinated.com/wp-json/wp/v2';
 
 export interface WPPost {
   id: number;
