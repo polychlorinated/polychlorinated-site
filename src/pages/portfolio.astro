@@ -1,0 +1,108 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { clients } from '@/data/portfolio';
+import { services } from '@/data/services';
+
+const gtmClients = clients.filter((c) => c.category === 'Go-To-Market');
+const aiClients = clients.filter((c) => c.category === 'AI & Automation');
+---
+
+<Layout
+  title="Work"
+  description="Selected client engagements across go-to-market strategy, AI-powered marketing, and startup operations."
+>
+  <!-- Hero -->
+  <section class="pt-36 pb-20 max-w-6xl mx-auto px-6">
+    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-blue-600 mb-5">Our Work</p>
+    <h1 class="text-5xl sm:text-6xl font-bold text-slate-900 mb-6 max-w-2xl leading-none">
+      Selected Client Work
+    </h1>
+    <p class="text-xl text-slate-500 max-w-xl leading-relaxed">
+      From early-stage startups to growing SMBs — a cross-section of the companies
+      we've helped build better systems.
+    </p>
+  </section>
+
+  <!-- Client sections -->
+  <section class="pb-24 max-w-6xl mx-auto px-6">
+    <div class="space-y-20">
+      <!-- GTM -->
+      <div>
+        <div class="flex items-center gap-4 mb-8">
+          <span class="text-xs font-semibold tracking-[0.2em] uppercase text-slate-400">
+            Go-To-Market
+          </span>
+          <div class="flex-1 h-px bg-slate-100"></div>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {gtmClients.map((client) => (
+            <div class="p-6 rounded-xl border border-slate-100 hover:border-slate-300 hover:bg-slate-50 transition-all">
+              <span class="text-[10px] font-semibold tracking-widest uppercase text-blue-500 block mb-3">
+                GTM
+              </span>
+              <p class="font-semibold text-slate-900">{client.name}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- AI & Automation -->
+      <div>
+        <div class="flex items-center gap-4 mb-8">
+          <span class="text-xs font-semibold tracking-[0.2em] uppercase text-slate-400">
+            AI & Automation
+          </span>
+          <div class="flex-1 h-px bg-slate-100"></div>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {aiClients.map((client) => (
+            <div class="p-6 rounded-xl border border-slate-100 hover:border-slate-300 hover:bg-slate-50 transition-all">
+              <span class="text-[10px] font-semibold tracking-widest uppercase text-violet-500 block mb-3">
+                AI & Automation
+              </span>
+              <p class="font-semibold text-slate-900">{client.name}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services reminder -->
+  <section class="bg-slate-50 py-24">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="mb-12">
+        <p class="text-xs font-semibold tracking-[0.2em] uppercase text-blue-600 mb-3">Capabilities</p>
+        <h2 class="text-4xl font-bold text-slate-900">How We Engage</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6">
+        {services.map((service) => (
+          <div class="bg-white rounded-2xl p-8 border border-slate-100">
+            <p class="text-xs font-semibold tracking-widest uppercase text-slate-400 mb-3">
+              {service.tagline}
+            </p>
+            <h3 class="text-xl font-bold text-slate-900 mb-3">{service.name}</h3>
+            <p class="text-slate-500 text-sm leading-relaxed">{service.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-24">
+    <div class="max-w-6xl mx-auto px-6 text-center">
+      <h2 class="text-4xl font-bold text-slate-900 mb-6">Interested in working together?</h2>
+      <p class="text-lg text-slate-500 mb-10">Tell us about your project and we'll find the right approach.</p>
+      <a
+        href="/contact"
+        class="inline-flex items-center gap-2 px-8 py-4 bg-slate-900 text-white font-medium rounded-md hover:bg-slate-700 transition-colors"
+      >
+        Start the conversation
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        </svg>
+      </a>
+    </div>
+  </section>
+</Layout>

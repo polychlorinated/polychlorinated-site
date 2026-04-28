@@ -1,0 +1,116 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { getPost, getAllPostSlugs, formatDate, getFeaturedImage, getExcerpt } from '@/lib/wordpress';
+
+export async function getStaticPaths() {
+  const slugs = await getAllPostSlugs();
+  return slugs.map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const post = await getPost(slug);
+
+if (!post) {
+  return Astro.redirect('/blog', 302);
+}
+
+const image = getFeaturedImage(post);
+const excerpt = getExcerpt(post, 160);
+const author = post._embedded?.author?.[0];
+---
+
+<Layout
+  title={post.title.rendered.replace(/<[^>]*>/g, '')}
+  description={excerpt}
+  image={image?.src}
+>
+  <!-- Back nav -->
+  <div class="pt-28 pb-4 max-w-3xl mx-auto px-6">
+    <a
+      href="/blog"
+      class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition-colors"
+    >
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+      </svg>
+      All posts
+    </a>
+  </div>
+
+  <!-- Article -->
+  <article class="max-w-3xl mx-auto px-6 pb-24">
+    <!-- Header -->
+    <header class="mb-12">
+      <time class="text-sm text-slate-400 block mb-6">{formatDate(post.date)}</time>
+      <h1
+        class="text-4xl sm:text-5xl font-bold text-slate-900 leading-tight mb-8"
+        set:html={post.title.rendered}
+      />
+      {author && (
+        <div class="flex items-center gap-3">
+          {author.avatar_urls?.['48'] && (
+            <img
+              src={author.avatar_urls['48']}
+              alt={author.name}
+              class="w-9 h-9 rounded-full"
+              width="36"
+              height="36"
+            />
+          )}
+          <div>
+            <p class="text-sm font-medium text-slate-900">{author.name}</p>
+          </div>
+        </div>
+      )}
+    </header>
+
+    <!-- Featured image -->
+    {image && (
+      <div class="rounded-2xl overflow-hidden mb-12 aspect-[16/9] bg-slate-100">
+        <img
+          src={image.src}
+          alt={image.alt}
+          class="w-full h-full object-cover"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+    )}
+
+    <!-- Content -->
+    <div class="prose-wp" set:html={post.content.rendered} />
+
+    <!-- Tags -->
+    {post._embedded?.['wp:term']?.[1]?.length > 0 && (
+      <div class="mt-12 pt-8 border-t border-slate-100">
+        <div class="flex flex-wrap gap-2">
+          {post._embedded['wp:term'][1].map((tag) => (
+            <span class="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-full">
+              {tag.name}
+            </span>
+          ))}
+        </div>
+      </div>
+    )}
+  </article>
+
+  <!-- Footer CTA -->
+  <section class="bg-slate-50 py-20">
+    <div class="max-w-3xl mx-auto px-6 text-center">
+      <p class="text-xs font-semibold tracking-[0.2em] uppercase text-blue-600 mb-4">Polychlorinated Ventures</p>
+      <h2 class="text-3xl font-bold text-slate-900 mb-4">Want to work together?</h2>
+      <p class="text-slate-500 mb-8">
+        If this resonates with what you're building, let's talk.
+      </p>
+      <a
+        href="/contact"
+        class="inline-flex items-center gap-2 px-6 py-3.5 bg-slate-900 text-white font-medium text-sm rounded-md hover:bg-slate-700 transition-colors"
+      >
+        Get in touch
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        </svg>
+      </a>
+    </div>
+  </section>
+</Layout>

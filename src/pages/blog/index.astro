@@ -1,0 +1,76 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { getPosts, getExcerpt, formatDate, getFeaturedImage } from '@/lib/wordpress';
+
+const posts = await getPosts({ perPage: 20 });
+---
+
+<Layout
+  title="Blog"
+  description="Writing on go-to-market strategy, AI-powered marketing, startup operations, and growth systems."
+>
+  <!-- Hero -->
+  <section class="pt-36 pb-16 max-w-6xl mx-auto px-6">
+    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-blue-600 mb-5">Writing</p>
+    <h1 class="text-5xl sm:text-6xl font-bold text-slate-900 mb-6 leading-none">
+      Ideas & Insights
+    </h1>
+    <p class="text-xl text-slate-500 max-w-xl leading-relaxed">
+      Thinking out loud on growth systems, GTM strategy, AI in marketing,
+      and building companies with scientific precision.
+    </p>
+  </section>
+
+  <!-- Posts -->
+  <section class="pb-24 max-w-6xl mx-auto px-6">
+    {posts.length === 0 ? (
+      <div class="py-24 text-center">
+        <div class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-6">
+          <svg class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-slate-900 mb-2">Posts coming soon</h2>
+        <p class="text-slate-500 text-sm max-w-xs mx-auto">
+          New writing will appear here once connected to WordPress.
+        </p>
+      </div>
+    ) : (
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {posts.map((post) => {
+          const image = getFeaturedImage(post);
+          const excerpt = getExcerpt(post, 130);
+          return (
+            <a
+              href={`/blog/${post.slug}`}
+              class="group flex flex-col rounded-2xl border border-slate-100 hover:border-slate-200 hover:shadow-md overflow-hidden transition-all"
+            >
+              {image && (
+                <div class="aspect-[16/9] overflow-hidden bg-slate-100">
+                  <img
+                    src={image.src}
+                    alt={image.alt}
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              )}
+              <div class="p-7 flex flex-col flex-1">
+                <time class="text-xs text-slate-400 mb-3 block">{formatDate(post.date)}</time>
+                <h2
+                  class="text-lg font-semibold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors leading-snug"
+                  set:html={post.title.rendered}
+                />
+                <p class="text-sm text-slate-500 leading-relaxed flex-1">{excerpt}</p>
+                <span class="mt-6 text-xs font-semibold text-blue-600 inline-flex items-center gap-1">
+                  Read more →
+                </span>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    )}
+  </section>
+</Layout>
