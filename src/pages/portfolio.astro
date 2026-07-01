@@ -35,14 +35,33 @@ const aiClients = clients.filter((c) => c.category === 'AI & Automation');
           <div class="flex-1 h-px bg-slate-100"></div>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {gtmClients.map((client) => (
-            <div class="p-6 rounded-xl border border-slate-100 hover:border-slate-300 hover:bg-slate-50 transition-all">
-              <span class="text-[10px] font-semibold tracking-widest uppercase text-blue-500 block mb-3">
-                GTM
-              </span>
-              <p class="font-semibold text-slate-900">{client.name}</p>
-            </div>
-          ))}
+          {gtmClients.map((client) => {
+            const dark = !!client.bgColor;
+            const baseClass = `flex flex-col p-6 rounded-xl border transition-all ${dark ? 'border-transparent hover:opacity-90' : 'border-slate-100 hover:border-slate-300 hover:bg-slate-50 bg-white'}`;
+            const style = dark ? `background-color: ${client.bgColor}` : '';
+            const inner = (
+              <>
+                {client.logo && (
+                  <div class="h-20 flex items-center mb-5">
+                    <img src={client.logo} alt={client.name} class="max-h-full max-w-full object-contain object-left" loading="lazy" />
+                  </div>
+                )}
+                <span class={`text-[10px] font-semibold tracking-widest uppercase block mb-1 ${dark ? 'text-blue-400' : 'text-blue-500'}`}>
+                  GTM
+                </span>
+                <p class={`font-semibold text-sm ${dark ? 'text-white' : 'text-slate-900'}`}>{client.name}</p>
+              </>
+            );
+            return client.url ? (
+              <a href={client.url} target="_blank" rel="noopener noreferrer" class={baseClass} style={style}>
+                {inner}
+              </a>
+            ) : (
+              <div class={baseClass} style={style}>
+                {inner}
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -55,14 +74,33 @@ const aiClients = clients.filter((c) => c.category === 'AI & Automation');
           <div class="flex-1 h-px bg-slate-100"></div>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {aiClients.map((client) => (
-            <div class="p-6 rounded-xl border border-slate-100 hover:border-slate-300 hover:bg-slate-50 transition-all">
-              <span class="text-[10px] font-semibold tracking-widest uppercase text-violet-500 block mb-3">
-                AI & Automation
-              </span>
-              <p class="font-semibold text-slate-900">{client.name}</p>
-            </div>
-          ))}
+          {aiClients.map((client) => {
+            const dark = !!client.bgColor;
+            const baseClass = `flex flex-col p-6 rounded-xl border transition-all ${dark ? 'border-transparent hover:opacity-90' : 'border-slate-100 hover:border-slate-300 hover:bg-slate-50 bg-white'}`;
+            const style = dark ? `background-color: ${client.bgColor}` : '';
+            const inner = (
+              <>
+                {client.logo && (
+                  <div class="h-20 flex items-center mb-5">
+                    <img src={client.logo} alt={client.name} class="max-h-full max-w-full object-contain object-left" loading="lazy" />
+                  </div>
+                )}
+                <span class={`text-[10px] font-semibold tracking-widest uppercase block mb-1 ${dark ? 'text-violet-400' : 'text-violet-500'}`}>
+                  AI & Automation
+                </span>
+                <p class={`font-semibold text-sm ${dark ? 'text-white' : 'text-slate-900'}`}>{client.name}</p>
+              </>
+            );
+            return client.url ? (
+              <a href={client.url} target="_blank" rel="noopener noreferrer" class={baseClass} style={style}>
+                {inner}
+              </a>
+            ) : (
+              <div class={baseClass} style={style}>
+                {inner}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
