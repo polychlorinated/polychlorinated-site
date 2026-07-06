@@ -10,11 +10,11 @@ const recentPosts = await getPosts({ perPage: 3 });
 
 <Layout>
   <!-- Polymerization watermark — fixed behind page content -->
-  <PolymerizationWatermark class="fixed inset-0 w-full h-full -z-10" />
+  <PolymerizationWatermark class="fixed inset-0 w-full h-full z-[1] mix-blend-overlay" />
 
   <!-- Hero -->
-  <section class="min-h-screen flex items-center pt-16">
-    <div class="max-w-6xl mx-auto px-6 py-24 lg:py-32">
+  <section class="relative min-h-screen flex items-center pt-16">
+    <div class="relative z-10 max-w-6xl mx-auto px-6 py-24 lg:py-32">
       <div class="max-w-4xl">
         <h1 class="text-6xl sm:text-7xl lg:text-8xl font-bold text-slate-900 leading-none mb-8">
           The Chemistry of <br class="hidden sm:block" /> Growth.
@@ -44,8 +44,8 @@ const recentPosts = await getPosts({ perPage: 3 });
   </section>
 
   <!-- Services -->
-  <section class="bg-slate-50 py-24 lg:py-32">
-    <div class="max-w-6xl mx-auto px-6">
+  <section class="relative py-24 lg:py-32">
+    <div class="relative z-10 max-w-6xl mx-auto px-6">
       <div class="mb-16">
         <p class="text-xs font-semibold tracking-[0.2em] uppercase text-blue-600 mb-3">Services</p>
         <h2 class="text-4xl font-bold text-slate-900">What We Do</h2>
@@ -68,7 +68,7 @@ const recentPosts = await getPosts({ perPage: 3 });
 
   <!-- Clients -->
   <section class="py-24 lg:py-32">
-    <div class="max-w-6xl mx-auto px-6">
+    <div class="relative z-10 max-w-6xl mx-auto px-6">
       <div class="mb-16">
         <p class="text-xs font-semibold tracking-[0.2em] uppercase text-blue-600 mb-3">Portfolio</p>
         <h2 class="text-4xl font-bold text-slate-900">Selected Clients</h2>
@@ -98,8 +98,9 @@ const recentPosts = await getPosts({ perPage: 3 });
   </section>
 
   <!-- About -->
-  <section class="bg-slate-900 py-24 lg:py-32 text-white">
-    <div class="max-w-6xl mx-auto px-6">
+  <section class="relative py-24 lg:py-32 text-white">
+    <div class="absolute inset-0 -z-10 bg-slate-900" aria-hidden="true"></div>
+    <div class="relative z-10 max-w-6xl mx-auto px-6">
       <div class="grid lg:grid-cols-2 gap-16 items-center">
         <div>
           <p class="text-xs font-semibold tracking-[0.2em] uppercase text-blue-400 mb-6">About</p>
@@ -158,7 +159,7 @@ const recentPosts = await getPosts({ perPage: 3 });
   <!-- Blog preview -->
   {recentPosts.length > 0 && (
     <section class="py-24 lg:py-32">
-      <div class="max-w-6xl mx-auto px-6">
+      <div class="relative z-10 max-w-6xl mx-auto px-6">
         <div class="flex items-end justify-between mb-16">
           <div>
             <p class="text-xs font-semibold tracking-[0.2em] uppercase text-blue-600 mb-3">Writing</p>
@@ -203,8 +204,8 @@ const recentPosts = await getPosts({ perPage: 3 });
   )}
 
   <!-- CTA -->
-  <section class="border-t border-slate-100 py-24 lg:py-32">
-    <div class="max-w-6xl mx-auto px-6 text-center">
+  <section class="relative border-t border-slate-100 py-24 lg:py-32">
+    <div class="relative z-10 max-w-6xl mx-auto px-6 text-center">
       <h2 class="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">
         Ready to build something that scales?
       </h2>

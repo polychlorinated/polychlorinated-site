@@ -95,8 +95,8 @@ const { class: className = '' } = Astro.props;
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
             ctx.lineTo(b.x, b.y);
-            ctx.strokeStyle = `rgba(148, 163, 184, ${strength * 0.3})`;
-            ctx.lineWidth = 1;
+            ctx.strokeStyle = `rgba(148, 163, 184, ${strength * 0.45})`;
+            ctx.lineWidth = 1.1;
             ctx.stroke();
             connections++;
           }
@@ -106,7 +106,7 @@ const { class: className = '' } = Astro.props;
       for (const p of particles) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(148, 163, 184, 0.45)';
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
         ctx.fill();
       }
     }
