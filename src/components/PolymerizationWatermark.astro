@@ -41,10 +41,10 @@ const { class: className = '' } = Astro.props;
     window.addEventListener('resize', resize);
 
     const area = width * height;
-    const PARTICLE_COUNT = Math.min(32, Math.max(14, Math.floor(area / 30000)));
-    const CONNECTION_DISTANCE = 120;
+    const PARTICLE_COUNT = Math.min(40, Math.max(16, Math.floor(area / 26000)));
+    const CONNECTION_DISTANCE = 140;
     const MAX_CONNECTIONS = 3;
-    const DRIFT_SPEED = 0.2;
+    const DRIFT_SPEED = 0.22;
 
     type Particle = {
       x: number;
@@ -59,7 +59,7 @@ const { class: className = '' } = Astro.props;
       y: Math.random() * height,
       vx: (Math.random() - 0.5) * DRIFT_SPEED,
       vy: (Math.random() - 0.5) * DRIFT_SPEED,
-      radius: 1.2 + Math.random() * 1.6,
+      radius: 1.8 + Math.random() * 1.6,
     }));
 
     function update() {
@@ -95,8 +95,8 @@ const { class: className = '' } = Astro.props;
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
             ctx.lineTo(b.x, b.y);
-            ctx.strokeStyle = `rgba(148, 163, 184, ${strength * 0.14})`;
-            ctx.lineWidth = 0.8;
+            ctx.strokeStyle = `rgba(148, 163, 184, ${strength * 0.3})`;
+            ctx.lineWidth = 1;
             ctx.stroke();
             connections++;
           }
@@ -106,7 +106,7 @@ const { class: className = '' } = Astro.props;
       for (const p of particles) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(148, 163, 184, 0.22)';
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.45)';
         ctx.fill();
       }
     }
