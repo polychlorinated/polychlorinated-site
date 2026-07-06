@@ -41,73 +41,142 @@ const { class: className = '' } = Astro.props;
     window.addEventListener('resize', resize);
 
     const area = width * height;
-    const PARTICLE_COUNT = Math.min(40, Math.max(16, Math.floor(area / 26000)));
-    const CONNECTION_DISTANCE = 140;
-    const MAX_CONNECTIONS = 3;
-    const DRIFT_SPEED = 0.22;
+    const RING_COUNT = Math.min(12, Math.max(5, Math.floor(area / 90000)));
+    const RING_RADIUS = 22;
+    const VERTEX_RADIUS = 2.2;
+    const CONNECTION_DISTANCE = 42;
+    const MAX_INTER_RING_BONDS = 2;
+    const DRIFT_SPEED = 0.18;
+    const ROTATION_SPEED = 0.003;
 
-    type Particle = {
+    const DARK_BOND = 'rgba(30, 41, 59, 0.5)';
+    const LIGHT_BOND = 'rgba(203, 213, 225, 0.55)';
+    const INTER_BOND = 'rgba(148, 163, 184, 0.45)';
+    const VERTEX_STROKE = 'rgba(71, 85, 105, 0.6)';
+
+    type Ring = {
       x: number;
       y: number;
       vx: number;
       vy: number;
-      radius: number;
+      angle: number;
+      va: number;
     };
 
-    const particles: Particle[] = Array.from({ length: PARTICLE_COUNT }, () => ({
+    const rings: Ring[] = Array.from({ length: RING_COUNT }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
       vx: (Math.random() - 0.5) * DRIFT_SPEED,
       vy: (Math.random() - 0.5) * DRIFT_SPEED,
-      radius: 1.8 + Math.random() * 1.6,
+      angle: Math.random() * Math.PI * 2,
+      va: (Math.random() - 0.5) * ROTATION_SPEED,
     }));
 
-    function update() {
-      for (const p of particles) {
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < -24) p.x = width + 24;
-        if (p.x > width + 24) p.x = -24;
-        if (p.y < -24) p.y = height + 24;
-        if (p.y > height + 24) p.y = -24;
+    function getVertices(ring: Ring) {
+      const verts = [];
+      for (let i = 0; i < 6; i++) {
+        const a = ring.angle + (i * Math.PI) / 3;
+        verts.push({
+          x: ring.x + RING_RADIUS * Math.cos(a),
+          y: ring.y + RING_RADIUS * Math.sin(a),
+        });
       }
+      return verts;
+    }
+
+    function update() {
+      for (const ring of rings) {
+        ring.x += ring.vx;
+        ring.y += ring.vy;
+        ring.angle += ring.va;
+
+        if (ring.x < -RING_RADIUS * 2) ring.x = width + RING_RADIUS * 2;
+        if (ring.x > width + RING_RADIUS * 2) ring.x = -RING_RADIUS * 2;
+        if (ring.y < -RING_RADIUS * 2) ring.y = height + RING_RADIUS * 2;
+        if (ring.y > height + RING_RADIUS * 2) ring.y = -RING_RADIUS * 2;
+      }
+    }
+
+    function drawHexagon(x: number, y: number, radius: number, rotation: number) {
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const angle = rotation + (i * Math.PI) / 3;
+        const px = x + radius * Math.cos(angle);
+        const py = y + radius * Math.sin(angle);
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+    }
+
+    function drawBond(x1: number, y1: number, x2: number, y2: number, color: string, width: number) {
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.stroke();
     }
 
     function draw() {
       ctx.clearRect(0, 0, width, height);
 
-      // Draw bonds first so particles render on top.
-      for (let i = 0; i < particles.length; i++) {
-        const a = particles[i];
-        let connections = 0;
+      // Draw internal ring bonds with alternating dark/light colors.
+      for (const ring of rings) {
+        const verts = getVertices(ring);
+        for (let i = 0; i < 6; i++) {
+          const a = verts[i];
+          const b = verts[(i + 1) % 6];
+          const color = i % 2 === 0 ? DARK_BOND : LIGHT_BOND;
+          drawBond(a.x, a.y, b.x, b.y, color, 1.1);
+        }
+      }
 
-        for (let j = i + 1; j < particles.length; j++) {
-          if (connections >= MAX_CONNECTIONS) break;
+      // Draw inter-ring polymerization bonds.
+      for (let i = 0; i < rings.length; i++) {
+        const vertsA = getVertices(rings[i]);
+        let bonds = 0;
 
-          const b = particles[j];
-          const dx = a.x - b.x;
-          const dy = a.y - b.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+        for (let j = i + 1; j < rings.length; j++) {
+          if (bonds >= MAX_INTER_RING_BONDS) break;
 
-          if (dist < CONNECTION_DISTANCE) {
-            const strength = 1 - dist / CONNECTION_DISTANCE;
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.strokeStyle = `rgba(148, 163, 184, ${strength * 0.45})`;
-            ctx.lineWidth = 1.1;
-            ctx.stroke();
-            connections++;
+          const vertsB = getVertices(rings[j]);
+          let closest: { a: { x: number; y: number }; b: { x: number; y: number }; dist: number } | null = null;
+
+          for (const a of vertsA) {
+            for (const b of vertsB) {
+              const dx = a.x - b.x;
+              const dy = a.y - b.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < CONNECTION_DISTANCE && (!closest || dist < closest.dist)) {
+                closest = { a, b, dist };
+              }
+            }
+          }
+
+          if (closest) {
+            const strength = 1 - closest.dist / CONNECTION_DISTANCE;
+            drawBond(
+              closest.a.x,
+              closest.a.y,
+              closest.b.x,
+              closest.b.y,
+              INTER_BOND.replace(/[\d.]+\)$/, `${strength * 0.45})`),
+              0.9
+            );
+            bonds++;
           }
         }
       }
 
-      for (const p of particles) {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
-        ctx.fill();
+      // Draw vertices as small hexagons.
+      for (const ring of rings) {
+        for (const v of getVertices(ring)) {
+          drawHexagon(v.x, v.y, VERTEX_RADIUS, ring.angle);
+          ctx.strokeStyle = VERTEX_STROKE;
+          ctx.lineWidth = 0.9;
+          ctx.stroke();
+        }
       }
     }
 
