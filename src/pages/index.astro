@@ -1,5 +1,6 @@
 ---
 import Layout from '@/layouts/Layout.astro';
+import PolymerizationWatermark from '@/components/PolymerizationWatermark.astro';
 import { services } from '@/data/services';
 import { clients } from '@/data/portfolio';
 import { getPosts, getExcerpt, formatDate } from '@/lib/wordpress';
@@ -9,8 +10,9 @@ const recentPosts = await getPosts({ perPage: 3 });
 
 <Layout>
   <!-- Hero -->
-  <section class="min-h-screen flex items-center pt-16">
-    <div class="max-w-6xl mx-auto px-6 py-24 lg:py-32">
+  <section class="relative min-h-screen flex items-center pt-16 overflow-hidden">
+    <PolymerizationWatermark class="absolute inset-0 w-full h-full" />
+    <div class="relative max-w-6xl mx-auto px-6 py-24 lg:py-32">
       <div class="max-w-4xl">
         <h1 class="text-6xl sm:text-7xl lg:text-8xl font-bold text-slate-900 leading-none mb-8">
           The Chemistry of <br class="hidden sm:block" /> Growth.

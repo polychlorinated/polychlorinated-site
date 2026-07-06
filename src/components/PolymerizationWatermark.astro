@@ -1,0 +1,131 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<canvas
+  id="polymer-watermark"
+  class:list={['pointer-events-none', className]}
+  aria-hidden="true"
+></canvas>
+
+<script>
+  (function () {
+    const canvas = document.getElementById('polymer-watermark') as HTMLCanvasElement | null;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    function resize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    const area = width * height;
+    const PARTICLE_COUNT = Math.min(32, Math.max(14, Math.floor(area / 30000)));
+    const CONNECTION_DISTANCE = 120;
+    const MAX_CONNECTIONS = 3;
+    const DRIFT_SPEED = 0.2;
+
+    type Particle = {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      radius: number;
+    };
+
+    const particles: Particle[] = Array.from({ length: PARTICLE_COUNT }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * DRIFT_SPEED,
+      vy: (Math.random() - 0.5) * DRIFT_SPEED,
+      radius: 1.2 + Math.random() * 1.6,
+    }));
+
+    function update() {
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < -24) p.x = width + 24;
+        if (p.x > width + 24) p.x = -24;
+        if (p.y < -24) p.y = height + 24;
+        if (p.y > height + 24) p.y = -24;
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw bonds first so particles render on top.
+      for (let i = 0; i < particles.length; i++) {
+        const a = particles[i];
+        let connections = 0;
+
+        for (let j = i + 1; j < particles.length; j++) {
+          if (connections >= MAX_CONNECTIONS) break;
+
+          const b = particles[j];
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < CONNECTION_DISTANCE) {
+            const strength = 1 - dist / CONNECTION_DISTANCE;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.strokeStyle = `rgba(148, 163, 184, ${strength * 0.14})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+            connections++;
+          }
+        }
+      }
+
+      for (const p of particles) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.22)';
+        ctx.fill();
+      }
+    }
+
+    let raf: number;
+    function loop() {
+      update();
+      draw();
+      raf = requestAnimationFrame(loop);
+    }
+
+    loop();
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        cancelAnimationFrame(raf);
+      } else {
+        loop();
+      }
+    });
+  })();
+</script>
